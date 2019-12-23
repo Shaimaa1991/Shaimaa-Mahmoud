@@ -1,0 +1,822 @@
+{
+	"info": {
+		"_postman_id": "73590cbe-b763-4e55-8e1b-1b4ee9bf1bce",
+		"name": "API Playground",
+		"description": "These requests showcase some of the things you can do with the API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Highest Priced Products",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ff533023-3feb-4093-bdb7-f8e563231b64",
+						"exec": [
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Order is Correct Descending\", function () {",
+							"    ",
+							"    let jsonData = pm.response.json().data;",
+							"    if(pm.response.json().data.length > 0){",
+							"        var greatestPrice = pm.response.json().data[0].price;",
+							"        for (var record of jsonData) {",
+							"            if(record.price <= greatestPrice){",
+							"                greatestPrice = record.price;",
+							"            }else{",
+							"                pm.expect.fail(\"Wrong Order\");",
+							"            }",
+							"        }",
+							"    }",
+							"    ",
+							"});",
+							"",
+							"",
+							"pm.test(\"All prices are positive values\", function () {",
+							"    let jsonData = pm.response.json().data;",
+							"    for (var record of jsonData) {",
+							"        if(record.price < 0 ){",
+							"           pm.expect.fail(\"Price Less than Zero\");",
+							"        }",
+							"    }",
+							"    ",
+							"});",
+							"",
+							"pm.test(\"Check number of data result are equal to the limit\", function () {",
+							"    if(pm.response.json().data.length != pm.response.json().limit){",
+							"           pm.expect.fail(\"limit not equal results\");",
+							"    }",
+							"    ",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3030/products?$sort[price]=-1",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "$sort[price]",
+							"value": "-1"
+						},
+						{
+							"key": "bad",
+							"value": "12",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Product Name and Description Only",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4fbb2efc-530c-4dac-ad17-0779239cf3cf",
+						"exec": [
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Check that the API get only name and description \", function () {",
+							"    const keys = Object.keys(pm.response.json().data[0]);",
+							"    if (keys.length != 2 || !keys.includes('name') || !keys.includes('description')) {",
+							"       pm.expect.fail(\"wrong data\");",
+							"    }",
+							"});",
+							"",
+							"",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3030/products?$select[]=name&$select[]=description",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "$select[]",
+							"value": "name"
+						},
+						{
+							"key": "$select[]",
+							"value": "description"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "TVs with free shipping and price between $500 and $800",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "16702d10-2b18-416d-9091-5740c54e85c1",
+						"exec": [
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Check that the API get TVs that are free shipping and price between 500 to 800 only \", function () {",
+							"    let jsonData = pm.response.json().data;",
+							"    if(pm.response.json().data.length > 0){",
+							"        for (var record of jsonData) {",
+							"            if(record.shipping !== 0 || !(record.price <= 800 &&  record.price >= 500) && record.name.toUpperCase().include(\"TV\")){",
+							"                pm.expect.fail(\" Wrong data\");",
+							"            }",
+							"        }",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3030/products?category.name=TVs&price[$gt]=500&price[$lt]=800&shipping[$eq]=0",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"products"
+					],
+					"query": [
+						{
+							"key": "category.name",
+							"value": "TVs"
+						},
+						{
+							"key": "price[$gt]",
+							"value": "500"
+						},
+						{
+							"key": "price[$lt]",
+							"value": "800"
+						},
+						{
+							"key": "shipping[$eq]",
+							"value": "0"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Category Names Only",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ffc8233d-7ed8-4f1e-a313-1bcf87fd56bc",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Check that the API get only Category\", function () {",
+							"    const keys = Object.keys(pm.response.json().data[0]);",
+							"    if (keys.length != 10 || !keys.includes('Category')) {",
+							"       pm.expect.fail(\"wrong data\");",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3030/categories?$select[]=name",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"categories"
+					],
+					"query": [
+						{
+							"key": "$select[]",
+							"value": "name"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Categories with TV in the name",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e56c1bd7-537e-460c-9eea-f49f81068cfe",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Check that the API get categories that have TV in the name only \", function () {",
+							"    const keys = Object.keys(pm.response.json().data[0]);",
+							"    if ( !keys.includes('subCategories') && record.name.toUpperCase().include(\"TV\")) {",
+							"       pm.expect.fail(\"wrong data\");",
+							"    }",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3030/categories?name[$like]=*TV*",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"categories"
+					],
+					"query": [
+						{
+							"key": "name[$like]",
+							"value": "*TV*"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find stores in Minnesota",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "362786a0-c6b5-49e3-aa6d-fabe0a179824",
+						"exec": [
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "0152ecc6-3d1a-4189-9e59-aac8c3a97a6f",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Check that the API get stores in minnestona\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"MN\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Check that the API get stores in minnestona only \", function () {",
+							"    let jsonData = pm.response.json().data;",
+							"    for (var record of jsonData) {",
+							"        if(record.storeId === 4 ){",
+							"           pm.expect.fail(\"wrong data\");",
+							"        }",
+							"    }",
+							"    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3030/stores?state=MN",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"stores"
+					],
+					"query": [
+						{
+							"key": "state",
+							"value": "MN"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find stores that sell Apple products",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "6321b0c5-f664-4231-970f-6d4ae4d10de4",
+						"exec": [
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "c16df2fa-e44f-48c4-a2a9-d6b0894fa268",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Get Stores that have apple product only\", function () {",
+							"    console.log(\"\");",
+							"    pm.expect(pm.response.text()).to.include(\"Apple Shop\");",
+							"  ",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3030/stores?service.name=Apple Shop",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"stores"
+					],
+					"query": [
+						{
+							"key": "service.name",
+							"value": "Apple Shop"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find Stores Within 10 Miles of Beverly Hills",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "aee4e9b2-5bce-49bc-9589-a37053156cdf",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Check that the API get stores within 10 miles of BH only \", function () {",
+							"    let jsonData = pm.response.json().data;",
+							"    if(pm.response.json().data.length > 0){",
+							"        for (var record of jsonData) {",
+							"            if(record.lng === -118.4389 && !(record.lat === 34.035656))",
+							"            ",
+							"            {",
+							"                pm.expect.fail(\" Wrong data\");",
+							"            }",
+							"        }",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3030/stores?near=90210&service.name=Windows%20Store",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"stores"
+					],
+					"query": [
+						{
+							"key": "near",
+							"value": "90210"
+						},
+						{
+							"key": "service.name",
+							"value": "Windows%20Store"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Product",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bfa1594e-bb7a-4cbe-8f9a-f13d3bf5557c",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Check that the API create new product has specific data only\", function () {",
+							"    ",
+							"    if ( pm.response.json().id === null || pm.response.json().id  <= 0 || ",
+							"    pm.response.json().name !=  \"New Product\" || ",
+							"    pm.response.json().type !=   \"Hard Good\" || ",
+							"\t pm.response.json().upc != \"12345676\" ||",
+							"\tpm.response.json().price !=  99.99 ||",
+							"\tpm.response.json().description != \"This is a placeholder request for creating a new product.\" ||",
+							"\tpm.response.json().model !=  \"NP12345\" ){",
+							"\t       pm.expect.fail(\"Wrong data\");",
+							"",
+							"\t}",
+							"\t",
+							"});",
+							"",
+							"",
+							"pm.test(\"Check the Created date is greater than current date by a bit seconds\", function () {",
+							"    ",
+							"       var currentDate = new Date();",
+							"       var excepectedCreationDate = new Date(pm.response.json().createdAt);",
+							"       currentDate.setMinutes( currentDate.getMinutes() + 1 );",
+							"        ",
+							"      if(excepectedCreationDate.getTime() > currentDate.getTime()){",
+							"          pm.expect.fail(\" Wrong data\");",
+							"      }",
+							"",
+							"\t",
+							"});",
+							"",
+							"",
+							"pm.test(\"Check the updated date is greater than current date by a bit seconds\", function () {",
+							"    ",
+							"       var currentDate = new Date();",
+							"       var excepectedupdateDate = new Date(pm.response.json().updatedAt);",
+							"       currentDate.setMinutes( currentDate.getMinutes() + 1 );",
+							"        ",
+							"      if(excepectedupdateDate.getTime() > currentDate.getTime()){",
+							"          pm.expect.fail(\" wrong data\");",
+							"      }",
+							"",
+							"\t",
+							"});",
+							"",
+							"",
+							"",
+							"",
+							"\t    ",
+							"\t     "
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"name\": \"New Product\",\n\t\"type\": \"Hard Good\",\n\t\"upc\": \"12345676\",\n\t\"price\": 99.99,\n\t\"description\": \"This is a placeholder request for creating a new product.\",\n\t\"model\": \"NP12345\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3030/products",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"products"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Store",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cd1b93f4-3bf0-4e0d-aadc-f636226bf300",
+						"exec": [
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "501af133-872f-4b09-b933-9715a30ed9ce",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Check that the API create new store has specific data only\", function () {",
+							"    ",
+							"    if ( pm.response.json().id === null || pm.response.json().id  <= 0 || ",
+							"    pm.response.json().name != \"New Store\" || ",
+							"    pm.response.json().type != \"BigBox\" || ",
+							"    pm.response.json().address != \"123 Fake St\" || ",
+							"     pm.response.json().address2 != \"\" || ",
+							"\t pm.response.json().city != \"Springfield\" ||",
+							"\tpm.response.json().state != \"MN\" ||",
+							"\tpm.response.json().zip != \"55123\" ||",
+							"\tpm.response.json().lat != 44.969658 ||",
+							"\tpm.response.json().lng != -93.449539 ||",
+							"\tpm.response.json().hours != \"Mon: 10-9; Tue: 10-9; Wed: 10-9; Thurs: 10-9; Fri: 10-9; Sat: 10-9; Sun: 10-8\")",
+							"\t{",
+							"\t       pm.expect.fail(\" Wrong data\");",
+							"\t}",
+							"\t",
+							"});",
+							"",
+							"",
+							"pm.test(\"Check the create date is greater than current date by a bit seconds\", function () {",
+							"    ",
+							"       var currentDate = new Date();",
+							"       var excepectedCreationDate = new Date(pm.response.json().createdAt);",
+							"       currentDate.setMinutes( currentDate.getMinutes() + 1 );",
+							"        ",
+							"      if(excepectedCreationDate.getTime() > currentDate.getTime()){",
+							"          pm.expect.fail(\"Wrong data\");",
+							"      }",
+							"",
+							"\t",
+							"});",
+							"",
+							"pm.test(\"Check the updated date is greater than current date by a bit seconds\", function () {",
+							"    ",
+							"       var currentDate = new Date();",
+							"       var excepectedupdateDate = new Date(pm.response.json().updatedAt);",
+							"       currentDate.setMinutes( currentDate.getMinutes() + 1 );",
+							"        ",
+							"      if(excepectedupdateDate.getTime() > currentDate.getTime()){",
+							"          pm.expect.fail(\" Wrong data\");",
+							"      }",
+							"",
+							"\t",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{      \n\t  \"name\": \"New Store\",\n      \"type\": \"BigBox\",\n      \"address\": \"123 Fake St\",\n      \"address2\": \"\",\n      \"city\": \"Springfield\",\n      \"state\": \"MN\",\n      \"zip\": \"55123\",\n      \"lat\": 44.969658,\n      \"lng\": -93.449539,\n      \"hours\": \"Mon: 10-9; Tue: 10-9; Wed: 10-9; Thurs: 10-9; Fri: 10-9; Sat: 10-9; Sun: 10-8\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3030/stores",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"stores"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Service",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "cd066092-d481-47ed-965a-f77cad409c01",
+						"exec": [
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "1c0fcc5c-6084-4074-87f7-b74135239d51",
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Check that the API create new service has specific data only\", function () {",
+							"    ",
+							"    if ( pm.response.json().id === null || pm.response.json().id  <= 0 || ",
+							"    pm.response.json().name != \"string\" )",
+							"\t{",
+							"\t       pm.expect.fail(\"wrong data\");",
+							"\t}",
+							"\t",
+							"});",
+							"",
+							"",
+							"pm.test(\"Check the create date is greater than current date by a bit seconds\", function () {",
+							"    ",
+							"       var currentDate = new Date();",
+							"       var excepectedCreationDate = new Date(pm.response.json().createdAt);",
+							"       currentDate.setMinutes( currentDate.getMinutes() + 1 );",
+							"        ",
+							"      if(excepectedCreationDate.getTime() > currentDate.getTime()){",
+							"          pm.expect.fail(\"wrong data\");",
+							"      }",
+							"",
+							"\t",
+							"});",
+							"",
+							"pm.test(\"Check the create date is greater than current date by a bit seconds\", function () {",
+							"    ",
+							"       var currentDate = new Date();",
+							"       var excepectedupdateDate = new Date(pm.response.json().updatedAt);",
+							"       currentDate.setMinutes( currentDate.getMinutes() + 1 );",
+							"        ",
+							"      if(excepectedupdateDate.getTime() > currentDate.getTime()){",
+							"          pm.expect.fail(\"wrong data\");",
+							"      }",
+							"",
+							"\t",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{      \n\t  \"name\": \"string\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3030/services",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"services"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Category",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "362786a0-c6b5-49e3-aa6d-fabe0a179824",
+						"exec": [
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "0152ecc6-3d1a-4189-9e59-aac8c3a97a6f",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "localhost:3030/stores?state=MN",
+					"host": [
+						"localhost"
+					],
+					"port": "3030",
+					"path": [
+						"stores"
+					],
+					"query": [
+						{
+							"key": "state",
+							"value": "MN"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
