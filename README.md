@@ -26,9 +26,9 @@ The registration scenario is exiting on "main.py".
 
 **Task 4**
 
-You will find the Task2 (automated APIs ) in Shaimaa Mahmoud repo in path: SShaimaa-Mahmoud/automation implementation/API Playground.postman_collection.json.
+You will find the Task2 (automated APIs ) in Shaimaa Mahmoud repo in path: Shaimaa-Mahmoud/automation implementation/API Playground.postman_collection.json.
 
-Hoe to run the automated API test cases:
+How to run the automated API test cases:
 
 1. Make sure you installed Postman.
 2. Make sure you installed Node JS.
